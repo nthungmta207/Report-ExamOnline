@@ -1,0 +1,4 @@
+﻿cl : Command line warning D9025: overriding '/MDd' with '/MT'
+  DetectNetFramwork.cpp
+  DetectNetFramwork.vcxproj -> C:\Users\ONION\documents\visual studio 2015\Projects\DetectNetFramwork\Debug\DetectNetFramwork.exe
+  DetectNetFramwork.vcxproj -> C:\Users\ONION\documents\visual studio 2015\Projects\DetectNetFramwork\Debug\DetectNetFramwork.pdb (Full PDB)
