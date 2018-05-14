@@ -5,6 +5,8 @@
 #include <strsafe.h>
 #include <mscoree.h>
 #include <Sensapi.h>
+#include <iostream>
+#include <windows.h>
 #pragma comment(lib, "Sensapi.lib")
 // In case the machine this is compiled on does not have the most recent platform SDK
 // with these values defined, define them here
@@ -865,6 +867,45 @@ bool RegistryGetValue(HKEY hk, const TCHAR * pszKey, const TCHAR * pszValue, DWO
 	return true;
 }
 
+void _tmain(int argc, TCHAR *argv[])
+{
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+
+	if (argc != 2)
+	{
+		printf("Usage: %s [cmdline]\n", argv[0]);
+		return;
+	}
+
+	// Start the child process. 
+	if (!CreateProcess(NULL,   // No module name (use command line)
+		argv[1],        // Command line
+		NULL,           // Process handle not inheritable
+		NULL,           // Thread handle not inheritable
+		FALSE,          // Set handle inheritance to FALSE
+		0,              // No creation flags
+		NULL,           // Use parent's environment block
+		NULL,           // Use parent's starting directory 
+		&si,            // Pointer to STARTUPINFO structure
+		&pi)           // Pointer to PROCESS_INFORMATION structure
+		)
+	{
+		printf("CreateProcess failed (%d).\n", GetLastError());
+		return;
+	}
+
+	// Wait until child process exits.
+	WaitForSingleObject(pi.hProcess, INFINITE);
+
+	// Close process and thread handles. 
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+}
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -926,15 +967,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		iNetfx10SPLevel = GetNetfx10SPLevel();
 
 		if (iNetfx10SPLevel > 0)
-			_stprintf_s(szMessage, MAX_PATH, _T(".NET Framework 1.0 service pack %i is installed."), iNetfx10SPLevel);
+			_stprintf_s(szMessage, MAX_PATH, _T(""), iNetfx10SPLevel);
 		else
-			_stprintf_s(szMessage, MAX_PATH, _T(".NET Framework 1.0 is installed with no service packs."));
+			_stprintf_s(szMessage, MAX_PATH, _T(""));
 
 		_tcscpy_s(szOutputString, szMessage);
 	}
 	else
 	{
-		_tcscpy_s(szOutputString, _T(".NET Framework 1.0 is not installed."));
+		_tcscpy_s(szOutputString, _T(""));
 	}
 
 	// If .NET Framework 1.1 is installed, get the
@@ -944,15 +985,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		iNetfx11SPLevel = GetNetfxSPLevel(g_szNetfx11RegKeyName, g_szNetfxStandardSPxRegValueName);
 
 		if (iNetfx11SPLevel > 0)
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 1.1 service pack %i is installed."), iNetfx11SPLevel);
+			_stprintf_s(szMessage, MAX_PATH, _T(""), iNetfx11SPLevel);
 		else
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 1.1 is installed with no service packs."));
+			_stprintf_s(szMessage, MAX_PATH, _T(""));
 
 		_tcscat_s(szOutputString, szMessage);
 	}
 	else
 	{
-		_tcscat_s(szOutputString, _T("\n\n.NET Framework 1.1 is not installed."));
+		_tcscat_s(szOutputString, _T(""));
 	}
 
 	// If .NET Framework 2.0 is installed, get the
@@ -962,15 +1003,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		iNetfx20SPLevel = GetNetfxSPLevel(g_szNetfx20RegKeyName, g_szNetfxStandardSPxRegValueName);
 
 		if (iNetfx20SPLevel > 0)
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 2.0 service pack %i is installed."), iNetfx20SPLevel);
+			_stprintf_s(szMessage, MAX_PATH, _T(""), iNetfx20SPLevel);
 		else
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 2.0 is installed with no service packs."));
+			_stprintf_s(szMessage, MAX_PATH, _T(""));
 
 		_tcscat_s(szOutputString, szMessage);
 	}
 	else
 	{
-		_tcscat_s(szOutputString, _T("\n\n.NET Framework 2.0 is not installed."));
+		_tcscat_s(szOutputString, _T(""));
 	}
 
 	// If .NET Framework 3.0 is installed, get the
@@ -980,15 +1021,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		iNetfx30SPLevel = GetNetfxSPLevel(g_szNetfx30SpRegKeyName, g_szNetfxStandardSPxRegValueName);
 
 		if (iNetfx30SPLevel > 0)
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 3.0 service pack %i is installed."), iNetfx30SPLevel);
+			_stprintf_s(szMessage, MAX_PATH, _T(""), iNetfx30SPLevel);
 		else
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 3.0 is installed with no service packs."));
+			_stprintf_s(szMessage, MAX_PATH, _T(""));
 
 		_tcscat_s(szOutputString, szMessage);
 	}
 	else
 	{
-		_tcscat_s(szOutputString, _T("\n\n.NET Framework 3.0 is not installed."));
+		_tcscat_s(szOutputString, _T(""));
 	}
 
 	// If .NET Framework 3.5 is installed, get the
@@ -998,15 +1039,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		iNetfx35SPLevel = GetNetfxSPLevel(g_szNetfx35RegKeyName, g_szNetfxStandardSPxRegValueName);
 
 		if (iNetfx35SPLevel > 0)
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 3.5 service pack %i is installed."), iNetfx35SPLevel);
+			_stprintf_s(szMessage, MAX_PATH, _T(""), iNetfx35SPLevel);
 		else
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 3.5 is installed with no service packs."));
+			_stprintf_s(szMessage, MAX_PATH, _T(""));
 
 		_tcscat_s(szOutputString, szMessage);
 	}
 	else
 	{
-		_tcscat_s(szOutputString, _T("\n\n.NET Framework 3.5 is not installed."));
+		_tcscat_s(szOutputString, _T(""));
 	}
 
 	// If .NET Framework 4 Client is installed, get the
@@ -1016,15 +1057,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		iNetfx40ClientSPLevel = GetNetfxSPLevel(g_szNetfx40ClientRegKeyName, g_szNetfx40SPxRegValueName);
 
 		if (iNetfx40ClientSPLevel > 0)
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4 client service pack %i is installed."), iNetfx40ClientSPLevel);
+			_stprintf_s(szMessage, MAX_PATH, _T(""), iNetfx40ClientSPLevel);
 		else
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4 client is installed with no service packs."));
+			_stprintf_s(szMessage, MAX_PATH, _T(""));
 
 		_tcscat_s(szOutputString, szMessage);
 	}
 	else
 	{
-		_tcscat_s(szOutputString, _T("\n\n.NET Framework 4 client is not installed."));
+		_tcscat_s(szOutputString, _T(""));
 	}
 
 	// If .NET Framework 4 Full is installed, get the
@@ -1034,15 +1075,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		iNetfx40FullSPLevel = GetNetfxSPLevel(g_szNetfx40FullRegKeyName, g_szNetfx40SPxRegValueName);
 
 		if (iNetfx40FullSPLevel > 0)
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4 full service pack %i is installed."), iNetfx40FullSPLevel);
+			_stprintf_s(szMessage, MAX_PATH, _T(""), iNetfx40FullSPLevel);
 		else
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4 full is installed with no service packs."));
+			_stprintf_s(szMessage, MAX_PATH, _T(""));
 
 		_tcscat_s(szOutputString, szMessage);
 	}
 	else
 	{
-		_tcscat_s(szOutputString, _T("\n\n.NET Framework 4 full is not installed."));
+		_tcscat_s(szOutputString, _T(""));
 	}
 
 	// If .NET Framework 4.5 is installed, get the
@@ -1055,7 +1096,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.5 service pack %i is installed."), iNetfx45SPLevel);
 		else
 			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.5 is installed with no service packs."));
-
+		
 		_tcscat_s(szOutputString, szMessage);
 	}
 	else
@@ -1070,15 +1111,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		iNetfx451SPLevel = GetNetfxSPLevel(g_szNetfx45RegKeyName, g_szNetfx40SPxRegValueName);
 
 		if (iNetfx451SPLevel > 0)
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.5.1 service pack %i is installed."), iNetfx451SPLevel);
+			_stprintf_s(szMessage, MAX_PATH, _T(""), iNetfx451SPLevel);
 		else
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.5.1 is installed with no service packs."));
+			_stprintf_s(szMessage, MAX_PATH, _T(""));
 
 		_tcscat_s(szOutputString, szMessage);
 	}
 	else
 	{
-		_tcscat_s(szOutputString, _T("\n\n.NET Framework 4.5.1 is not installed."));
+		_tcscat_s(szOutputString, _T(""));
 	}
 
 	// If .NET Framework 4.5.2 is installed, get the
@@ -1088,15 +1129,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		iNetfx452SPLevel = GetNetfxSPLevel(g_szNetfx45RegKeyName, g_szNetfx40SPxRegValueName);
 
 		if (iNetfx452SPLevel > 0)
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.5.2 service pack %i is installed."), iNetfx452SPLevel);
+			_stprintf_s(szMessage, MAX_PATH, _T(""), iNetfx452SPLevel);
 		else
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.5.2 is installed with no service packs."));
+			_stprintf_s(szMessage, MAX_PATH, _T(""));
 
 		_tcscat_s(szOutputString, szMessage);
 	}
 	else
 	{
-		_tcscat_s(szOutputString, _T("\n\n.NET Framework 4.5.2 is not installed."));
+		_tcscat_s(szOutputString, _T(""));
 	}
 
 	// If .NET Framework 4.6 is installed, get the
@@ -1106,15 +1147,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		iNetfx46SPLevel = GetNetfxSPLevel(g_szNetfx45RegKeyName, g_szNetfx40SPxRegValueName);
 
 		if (iNetfx46SPLevel > 0)
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.6 service pack %i is installed."), iNetfx46SPLevel);
+			_stprintf_s(szMessage, MAX_PATH, _T(""), iNetfx46SPLevel);
 		else
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.6 is installed with no service packs."));
+			_stprintf_s(szMessage, MAX_PATH, _T(""));
 
 		_tcscat_s(szOutputString, szMessage);
 	}
 	else
 	{
-		_tcscat_s(szOutputString, _T("\n\n.NET Framework 4.6 is not installed."));
+		_tcscat_s(szOutputString, _T(""));
 	}
 
 	// If .NET Framework 4.6.1 is installed, get the
@@ -1124,15 +1165,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		iNetfx461SPLevel = GetNetfxSPLevel(g_szNetfx45RegKeyName, g_szNetfx40SPxRegValueName);
 
 		if (iNetfx461SPLevel > 0)
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.6.1 service pack %i is installed."), iNetfx461SPLevel);
+			_stprintf_s(szMessage, MAX_PATH, _T(""), iNetfx461SPLevel);
 		else
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.6.1 is installed with no service packs."));
+			_stprintf_s(szMessage, MAX_PATH, _T(""));
 
 		_tcscat_s(szOutputString, szMessage);
 	}
 	else
 	{
-		_tcscat_s(szOutputString, _T("\n\n.NET Framework 4.6.1 is not installed."));
+		_tcscat_s(szOutputString, _T(""));
 	}
 
 	// If .NET Framework 4.6.2 is installed, get the
@@ -1142,15 +1183,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		iNetfx462SPLevel = GetNetfxSPLevel(g_szNetfx45RegKeyName, g_szNetfx40SPxRegValueName);
 
 		if (iNetfx462SPLevel > 0)
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.6.2 service pack %i is installed."), iNetfx462SPLevel);
+			_stprintf_s(szMessage, MAX_PATH, _T(""), iNetfx462SPLevel);
 		else
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.6.2 is installed with no service packs."));
+			_stprintf_s(szMessage, MAX_PATH, _T(""));
 
 		_tcscat_s(szOutputString, szMessage);
 	}
 	else
 	{
-		_tcscat_s(szOutputString, _T("\n\n.NET Framework 4.6.2 is not installed."));
+		_tcscat_s(szOutputString, _T(""));
 	}
 
 	// If .NET Framework 4.7 is installed, get the
@@ -1160,15 +1201,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		iNetfx47SPLevel = GetNetfxSPLevel(g_szNetfx45RegKeyName, g_szNetfx40SPxRegValueName);
 
 		if (iNetfx47SPLevel > 0)
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.7 service pack %i is installed."), iNetfx47SPLevel);
+			_stprintf_s(szMessage, MAX_PATH, _T(""), iNetfx47SPLevel);
 		else
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.7 is installed with no service packs."));
+			_stprintf_s(szMessage, MAX_PATH, _T(""));
 
 		_tcscat_s(szOutputString, szMessage);
 	}
 	else
 	{
-		_tcscat_s(szOutputString, _T("\n\n.NET Framework 4.7 is not installed."));
+		_tcscat_s(szOutputString, _T(""));
 	}
 
 	// If .NET Framework 4.7.1 is installed, get the
@@ -1178,15 +1219,15 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		iNetfx471SPLevel = GetNetfxSPLevel(g_szNetfx45RegKeyName, g_szNetfx40SPxRegValueName);
 
 		if (iNetfx471SPLevel > 0)
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.7.1 service pack %i is installed."), iNetfx471SPLevel);
+			_stprintf_s(szMessage, MAX_PATH, _T(""), iNetfx471SPLevel);
 		else
-			_stprintf_s(szMessage, MAX_PATH, _T("\n\n.NET Framework 4.7.1 is installed with no service packs."));
+			_stprintf_s(szMessage, MAX_PATH, _T(""));
 
 		_tcscat_s(szOutputString, szMessage);
 	}
 	else
 	{
-		_tcscat_s(szOutputString, _T("\n\n.NET Framework 4.7.1 is not installed."));
+		_tcscat_s(szOutputString, _T(""));
 	}
 	
 	//check LAN
